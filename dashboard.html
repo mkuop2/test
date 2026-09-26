@@ -1,0 +1,5466 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+  name="viewport"
+  content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover"
+>
+
+<title>GPU Platform</title>
+
+<link
+  rel="preconnect"
+  href="https://fonts.googleapis.com"
+>
+
+<link
+  rel="preconnect"
+  href="https://fonts.gstatic.com"
+  crossorigin
+>
+
+<link
+  href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Changa:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Tajawal:wght@400;500;600;700;800&display=swap"
+  rel="stylesheet"
+>
+
+<style>
+
+/* =====================================================
+   THEME
+===================================================== */
+
+:root{
+
+  --bg:#07100c;
+  --bg-soft:#09140e;
+
+  --card:#0c1711;
+  --card-2:#0f1c15;
+
+  --border:#193324;
+  --border-soft:#14281e;
+
+  --accent:#00d878;
+  --accent-bright:#00ff88;
+
+  --accent-soft:#103522;
+
+  --text:#f2f7f4;
+  --text-soft:#c7d4cc;
+  --muted:#718278;
+
+  --danger:#ff7373;
+  --danger-bg:#2a1111;
+
+  --warning:#ffd85a;
+  --warning-bg:#332b10;
+
+  --radius:18px;
+
+  --nav-height:72px;
+
+  --site-font:"Tajawal";
+  --base-font-size:14px;
+}
+
+
+/* =====================================================
+   RESET
+===================================================== */
+
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
+
+html{
+  margin:0;
+  padding:0;
+  background:var(--bg);
+  overflow-x:hidden;
+}
+
+body{
+  margin:0;
+  padding:0;
+
+  min-height:100%;
+
+  background:
+    radial-gradient(
+      circle at 50% -10%,
+      rgba(0,216,120,.07),
+      transparent 32%
+    ),
+    var(--bg);
+
+  color:var(--text);
+
+  font-family:
+    var(--site-font, "Tajawal"),
+    Tahoma,
+    Arial,
+    sans-serif;
+
+  font-size:var(--base-font-size);
+
+  overflow-x:hidden;
+  overflow-y:auto;
+
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior-x:none;
+
+  padding-bottom:
+    calc(
+      var(--nav-height) +
+      env(safe-area-inset-bottom) +
+      18px
+    );
+
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+
+button,
+input,
+select{
+  font:inherit;
+}
+
+button{
+  cursor:pointer;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible{
+  outline:2px solid var(--accent);
+  outline-offset:2px;
+}
+
+.app{
+  width:100%;
+  max-width:1100px;
+  margin:auto;
+}
+
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+.header{
+
+  padding:
+    max(14px,env(safe-area-inset-top))
+    16px
+    12px;
+
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+
+  position:sticky;
+  top:0;
+
+  z-index:50;
+
+  background:
+    rgba(7,16,12,.88);
+
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+
+  border-bottom:
+    1px solid rgba(25,51,36,.85);
+}
+
+.brand{
+
+  font-size:18px;
+
+  font-weight:800;
+
+  letter-spacing:.2px;
+
+  color:var(--accent-bright);
+}
+
+.header-user{
+
+  max-width:160px;
+
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+
+  font-size:11px;
+  font-weight:500;
+
+  color:var(--muted);
+}
+
+
+/* =====================================================
+   MAIN
+===================================================== */
+
+.main{
+  padding:18px 15px 24px;
+}
+
+.page{
+  display:none;
+
+  animation:
+    pageIn .22s ease;
+}
+
+.page.active{
+  display:block;
+}
+
+@keyframes pageIn{
+
+  from{
+    opacity:0;
+    transform:translateY(5px);
+  }
+
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+
+}
+
+
+/* =====================================================
+   PAGE TITLE
+===================================================== */
+
+.page-title{
+  margin:4px 2px 20px;
+}
+
+.page-title h1{
+
+  margin:0;
+
+  font-size:24px;
+
+  line-height:1.35;
+
+  font-weight:800;
+
+  letter-spacing:-.3px;
+}
+
+.page-title p{
+
+  margin:7px 0 0;
+
+  color:var(--muted);
+
+  font-size:12px;
+
+  font-weight:500;
+}
+
+
+/* =====================================================
+   PRODUCTS
+===================================================== */
+
+.products-grid{
+
+  display:grid;
+
+  grid-template-columns:
+    repeat(
+      auto-fit,
+      minmax(230px,1fr)
+    );
+
+  gap:14px;
+}
+
+.product-card{
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(15,28,21,.98),
+      rgba(10,21,15,.98)
+    );
+
+  border:
+    1px solid var(--border);
+
+  border-radius:var(--radius);
+
+  overflow:hidden;
+
+  transition:
+    transform .2s ease,
+    border-color .2s ease,
+    box-shadow .2s ease;
+
+  box-shadow:
+    0 5px 20px
+    rgba(0,0,0,.12);
+}
+
+.product-card:hover{
+
+  border-color:#27653e;
+
+  transform:translateY(-2px);
+
+  box-shadow:
+    0 10px 35px
+    rgba(0,0,0,.22);
+}
+
+.product-image{
+
+  height:180px;
+
+  background:
+    radial-gradient(
+      circle at 50% 45%,
+      #17452c 0%,
+      #0d2417 42%,
+      #08120c 100%
+    );
+
+  display:flex;
+
+  align-items:center;
+  justify-content:center;
+
+  overflow:hidden;
+
+  color:#4cffaa;
+
+  font-size:52px;
+
+  position:relative;
+}
+
+.product-image::after{
+  content:"";
+
+  position:absolute;
+
+  inset:0;
+
+  background:
+    linear-gradient(
+      180deg,
+      transparent 55%,
+      rgba(0,0,0,.25)
+    );
+
+  pointer-events:none;
+}
+
+.product-image img{
+
+  width:100%;
+  height:100%;
+
+  object-fit:cover;
+
+  display:block;
+}
+
+.product-content{
+  padding:17px;
+  position:relative;
+}
+
+.product-name{
+
+  font-size:17px;
+
+  font-weight:800;
+
+  color:var(--text);
+
+  margin-bottom:9px;
+}
+
+.product-price{
+
+  color:var(--accent-bright);
+
+  font-size:24px;
+
+  font-weight:800;
+
+  line-height:1;
+
+  margin-bottom:16px;
+
+  letter-spacing:.2px;
+}
+
+.product-info{
+
+  display:grid;
+
+  grid-template-columns:1fr 1fr;
+
+  gap:8px;
+
+  margin-bottom:15px;
+}
+
+.info-box{
+
+  background:
+    rgba(7,16,12,.72);
+
+  border:
+    1px solid var(--border-soft);
+
+  border-radius:11px;
+
+  padding:10px;
+}
+
+.info-label{
+
+  color:var(--muted);
+
+  font-size:10px;
+
+  font-weight:500;
+
+  margin-bottom:4px;
+}
+
+.info-value{
+
+  color:var(--text-soft);
+
+  font-size:12px;
+
+  font-weight:600;
+
+  overflow:hidden;
+
+  text-overflow:ellipsis;
+}
+
+.buy-btn{
+
+  width:100%;
+
+  border:0;
+
+  background:
+    linear-gradient(
+      135deg,
+      #00e17f,
+      #00c96f
+    );
+
+  color:#031109;
+
+  border-radius:12px;
+
+  min-height:47px;
+
+  font-weight:800;
+
+  transition:.18s ease;
+
+  box-shadow:
+    0 7px 18px
+    rgba(0,216,120,.12);
+}
+
+.buy-btn:hover{
+  filter:brightness(1.05);
+}
+
+.buy-btn:active{
+  transform:scale(.975);
+}
+
+.buy-btn:disabled{
+
+  opacity:.5;
+
+  cursor:not-allowed;
+}
+
+
+/* =====================================================
+   MY PRODUCTS - PREMIUM CARDS
+===================================================== */
+
+.my-product{
+
+  position:relative;
+
+  overflow:hidden;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(15,28,21,.99),
+      rgba(8,18,13,.99)
+    );
+
+  border:
+    1px solid var(--border);
+
+  border-radius:18px;
+
+  padding:0;
+
+  margin-bottom:12px;
+
+  box-shadow:
+    0 8px 28px
+    rgba(0,0,0,.17);
+
+  transition:
+    transform .18s ease,
+    border-color .18s ease,
+    box-shadow .18s ease;
+}
+
+.my-product:hover{
+
+  transform:translateY(-1px);
+
+  border-color:#27653e;
+
+  box-shadow:
+    0 12px 32px
+    rgba(0,0,0,.23);
+}
+
+.my-product::before{
+
+  content:"";
+
+  position:absolute;
+
+  top:-45px;
+  right:-45px;
+
+  width:130px;
+  height:130px;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(0,255,136,.10),
+      transparent 68%
+    );
+
+  pointer-events:none;
+}
+
+
+/* TOP */
+
+.my-product-top{
+
+  position:relative;
+
+  display:flex;
+
+  justify-content:space-between;
+
+  gap:12px;
+
+  align-items:center;
+
+  padding:15px 16px 13px;
+
+  border-bottom:
+    1px solid var(--border-soft);
+}
+
+.my-product-name{
+
+  min-width:0;
+
+  font-size:16px;
+
+  font-weight:800;
+
+  line-height:1.45;
+
+  overflow:hidden;
+
+  text-overflow:ellipsis;
+
+  white-space:nowrap;
+}
+
+
+/* STATUS */
+
+.badge{
+
+  flex:none;
+
+  display:inline-flex;
+
+  align-items:center;
+
+  gap:5px;
+
+  padding:6px 10px;
+
+  border-radius:30px;
+
+  font-size:10px;
+
+  font-weight:700;
+
+  white-space:nowrap;
+}
+
+.badge-active{
+
+  color:#55ffae;
+
+  background:rgba(16,59,37,.9);
+
+  border:
+    1px solid rgba(0,216,120,.16);
+}
+
+.badge-active::before{
+
+  content:"";
+
+  width:6px;
+  height:6px;
+
+  border-radius:50%;
+
+  background:#00ff88;
+
+  box-shadow:
+    0 0 7px
+    rgba(0,255,136,.55);
+}
+
+.badge-completed{
+
+  color:var(--warning);
+
+  background:var(--warning-bg);
+
+  border:
+    1px solid rgba(255,216,90,.12);
+}
+
+.badge-stopped{
+
+  color:#ff8585;
+
+  background:#431818;
+
+  border:
+    1px solid rgba(255,115,115,.12);
+}
+
+
+/* REWARD BOX */
+
+.reward-box{
+
+  position:relative;
+
+  margin:0;
+
+  padding:14px 16px 15px;
+
+  background:
+    rgba(7,16,12,.52);
+
+  border:0;
+
+  border-radius:0;
+
+  box-shadow:none;
+}
+
+
+/* INFORMATION ROW */
+
+.reward-line{
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:space-between;
+
+  gap:12px;
+
+  margin-bottom:10px;
+
+  min-height:22px;
+
+  font-size:11px;
+}
+
+.reward-line:last-child{
+
+  margin-bottom:0;
+}
+
+.reward-label{
+
+  color:var(--muted);
+
+  font-size:10px;
+
+  font-weight:500;
+}
+
+.reward-value{
+
+  color:var(--text-soft);
+
+  font-size:12px;
+
+  font-weight:700;
+
+  text-align:left;
+}
+
+.reward-value.green{
+
+  color:var(--accent-bright);
+}
+
+
+/* PROGRESS */
+
+.progress{
+
+  position:relative;
+
+  height:8px;
+
+  background:#13241b;
+
+  border:
+    1px solid rgba(25,51,36,.7);
+
+  border-radius:20px;
+
+  overflow:hidden;
+
+  margin:12px 0;
+
+}
+
+.progress-bar{
+
+  height:100%;
+
+  width:0%;
+
+  min-width:0;
+
+  border-radius:20px;
+
+  background:
+    linear-gradient(
+      90deg,
+      #00b967,
+      #00e17f,
+      #00ff88
+    );
+
+  box-shadow:
+    0 0 12px
+    rgba(0,255,136,.20);
+
+  transition:
+    width .35s ease;
+}
+
+
+/* TIMER */
+
+.timer{
+
+  display:inline-flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  min-width:86px;
+
+  padding:5px 8px;
+
+  border-radius:8px;
+
+  color:var(--accent-bright);
+
+  background:rgba(0,216,120,.07);
+
+  border:
+    1px solid rgba(0,216,120,.12);
+
+  font-size:11px;
+
+  font-weight:800;
+
+  direction:ltr;
+
+  letter-spacing:.3px;
+}
+
+
+/* CLAIM */
+
+.claim-btn{
+
+  width:100%;
+
+  margin-top:12px;
+
+  min-height:45px;
+
+  border:0;
+
+  border-radius:11px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #00e17f,
+      #00c96f
+    );
+
+  color:#031109;
+
+  font-weight:800;
+
+  box-shadow:
+    0 7px 18px
+    rgba(0,216,120,.10);
+
+  transition:
+    transform .18s ease,
+    filter .18s ease,
+    opacity .18s ease;
+}
+
+.claim-btn:hover{
+
+  filter:brightness(1.05);
+}
+
+.claim-btn:active{
+
+  transform:scale(.98);
+}
+
+.claim-btn:disabled{
+
+  opacity:.4;
+
+  cursor:not-allowed;
+
+  box-shadow:none;
+}
+
+
+/* PURCHASE DATE */
+
+.my-product > .muted{
+
+  display:block;
+
+  padding:
+    10px
+    16px
+    13px;
+
+  margin-top:0 !important;
+
+  border-top:
+    1px solid var(--border-soft);
+
+  font-size:10px !important;
+
+  color:var(--muted);
+}
+
+
+/* MOBILE */
+
+@media(max-width:480px){
+
+  .my-product-top{
+
+    padding:
+      14px
+      14px
+      12px;
+  }
+
+  .my-product-name{
+
+    font-size:15px;
+  }
+
+  .reward-box{
+
+    padding:
+      13px
+      14px
+      14px;
+  }
+
+  .reward-line{
+
+    font-size:11px;
+  }
+
+  .timer{
+
+    min-width:82px;
+
+    font-size:10px;
+  }
+
+}
+
+
+/* =====================================================
+   WALLET
+===================================================== */
+
+.balance-card{
+
+  background:
+    radial-gradient(
+      circle at 100% 0%,
+      rgba(0,255,136,.13),
+      transparent 40%
+    ),
+    linear-gradient(
+      135deg,
+      #103b25,
+      #0b1d13
+    );
+
+  border:
+    1px solid #27653e;
+
+  border-radius:20px;
+
+  padding:21px;
+
+  margin-bottom:13px;
+}
+
+.balance-label{
+
+  color:#91a99b;
+
+  font-size:11px;
+
+  font-weight:500;
+
+  margin-bottom:7px;
+}
+
+.balance-value{
+
+  font-size:32px;
+
+  color:var(--accent-bright);
+
+  font-weight:800;
+
+  line-height:1.2;
+}
+
+.wallet-actions{
+
+  display:grid;
+
+  grid-template-columns:1fr 1fr;
+
+  gap:10px;
+
+  margin-bottom:14px;
+}
+
+.action-btn{
+
+  border:
+    1px solid #254b33;
+
+  background:var(--card);
+
+  color:var(--text-soft);
+
+  min-height:47px;
+
+  border-radius:12px;
+
+  font-weight:700;
+}
+
+.action-btn.green{
+
+  background:var(--accent);
+
+  border-color:var(--accent);
+
+  color:#031109;
+}
+
+.wallet-tabs{
+
+  display:flex;
+
+  gap:7px;
+
+  overflow-x:auto;
+
+  scrollbar-width:none;
+
+  margin-bottom:12px;
+
+  padding-bottom:2px;
+
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior-x:contain;
+}
+
+.wallet-tabs::-webkit-scrollbar{
+  display:none;
+}
+
+.wallet-tab{
+
+  white-space:nowrap;
+
+  border:
+    1px solid var(--border);
+
+  background:var(--card);
+
+  color:#82948a;
+
+  border-radius:11px;
+
+  padding:9px 13px;
+
+  font-size:11px;
+
+  font-weight:600;
+
+  flex:0 0 auto;
+  min-height:42px;
+}
+
+.wallet-tab.active{
+
+  color:var(--accent-bright);
+
+  border-color:#27653e;
+
+  background:var(--accent-soft);
+}
+
+.wallet-content{
+  display:none;
+}
+
+.wallet-content.active{
+  display:block;
+}
+
+
+/* =====================================================
+   PANELS
+===================================================== */
+
+.panel{
+
+  background:var(--card);
+
+  border:
+    1px solid var(--border);
+
+  border-radius:var(--radius);
+
+  overflow:hidden;
+}
+
+.panel-header{
+
+  padding:15px;
+
+  border-bottom:
+    1px solid var(--border);
+
+  font-weight:800;
+
+  font-size:13px;
+}
+
+.panel-body{
+  padding:15px;
+}
+
+
+/* =====================================================
+   FORMS
+===================================================== */
+
+.form-group{
+  margin-bottom:15px;
+}
+
+.form-group label{
+
+  display:block;
+
+  color:#aab9b0;
+
+  font-size:12px;
+
+  font-weight:600;
+
+  margin-bottom:7px;
+}
+
+input,
+select{
+
+  width:100%;
+
+  min-height:47px;
+
+  background:#07100c;
+
+  border:
+    1px solid #294735;
+
+  color:#fff;
+
+  border-radius:11px;
+
+  padding:11px 12px;
+
+  outline:none;
+
+  font-size:13px;
+}
+
+input:focus,
+select:focus{
+  border-color:var(--accent);
+}
+
+input[type=file]{
+  padding:9px;
+}
+
+.payment-info{
+
+  display:none;
+
+  background:#091a10;
+
+  border:
+    1px solid #254b33;
+
+  border-radius:13px;
+
+  padding:14px;
+
+  margin-bottom:15px;
+}
+
+.payment-info.show{
+  display:block;
+}
+
+.payment-row{
+  margin-bottom:13px;
+}
+
+.payment-row:last-child{
+  margin-bottom:0;
+}
+
+.payment-label{
+
+  color:var(--muted);
+
+  font-size:10px;
+
+  font-weight:600;
+
+  margin-bottom:5px;
+}
+
+.wallet-address{
+
+  direction:ltr;
+
+  overflow:auto;
+
+  white-space:nowrap;
+
+  color:var(--accent-bright);
+
+  background:#07100c;
+
+  padding:10px;
+
+  border-radius:9px;
+
+  font-size:12px;
+}
+
+.instructions{
+
+  white-space:pre-wrap;
+
+  line-height:1.8;
+
+  color:#d2ddd6;
+
+  font-size:12px;
+}
+
+.submit{
+
+  width:100%;
+
+  min-height:48px;
+
+  border:0;
+
+  border-radius:12px;
+
+  background:var(--accent);
+
+  color:#031109;
+
+  font-weight:800;
+}
+
+
+/* =====================================================
+   ALERT
+===================================================== */
+
+.alert{
+
+  display:none;
+
+  padding:12px;
+
+  border-radius:11px;
+
+  margin-bottom:13px;
+
+  line-height:1.7;
+
+  font-size:12px;
+}
+
+.alert.show{
+  display:block;
+}
+
+.alert.success{
+
+  background:#10351f;
+
+  border:1px solid #1c6b3d;
+
+  color:#65ffae;
+}
+
+.alert.error{
+
+  background:#351313;
+
+  border:1px solid #702525;
+
+  color:#ff9999;
+}
+
+
+/* =========================
+   ACCOUNT
+========================= */
+
+.account-hero{
+  position:relative;
+  overflow:hidden;
+  text-align:center;
+  padding:24px 18px 22px;
+  margin-bottom:12px;
+  background:
+    radial-gradient(circle at 50% 0%,rgba(0,255,136,.11),transparent 48%),
+    linear-gradient(145deg,#10251a,#09150e);
+  border:1px solid var(--border);
+  border-radius:20px;
+  box-shadow:0 10px 30px rgba(0,0,0,.18);
+}
+
+.account-hero::before{
+  content:"";
+  position:absolute;
+  width:180px;
+  height:180px;
+  top:-110px;
+  right:-80px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(0,255,136,.08),transparent 70%);
+  pointer-events:none;
+}
+
+.account-avatar{
+  position:relative;
+  width:86px;
+  height:86px;
+  margin:0 auto 12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:50%;
+  background:linear-gradient(145deg,#123d27,#0a1c12);
+  border:2px solid rgba(0,255,136,.35);
+  color:var(--accent-bright);
+  font-size:27px;
+  font-weight:900;
+  box-shadow:
+    0 0 0 5px rgba(0,216,120,.05),
+    0 8px 25px rgba(0,0,0,.22);
+}
+
+.account-name{
+  color:var(--text);
+  font-size:20px;
+  font-weight:900;
+  line-height:1.4;
+  margin-bottom:3px;
+}
+
+.account-email{
+  color:var(--muted);
+  font-size:11px;
+  direction:ltr;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.account-stats{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-bottom:12px;
+}
+
+.account-stat{
+  background:linear-gradient(145deg,rgba(15,28,21,.98),rgba(8,18,13,.98));
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:15px;
+  text-align:center;
+}
+
+.account-stat-icon{
+  font-size:20px;
+  line-height:1;
+  margin-bottom:8px;
+}
+
+.account-stat-label{
+  color:var(--muted);
+  font-size:10px;
+  margin-bottom:5px;
+}
+
+.account-stat-value{
+  color:var(--text);
+  font-size:19px;
+  font-weight:900;
+}
+
+.account-level{
+  position:relative;
+  display:flex;
+  align-items:center;
+  gap:13px;
+  padding:15px;
+  margin-bottom:12px;
+  background:
+    linear-gradient(145deg,rgba(16,59,37,.72),rgba(8,22,14,.98));
+  border:1px solid rgba(0,216,120,.20);
+  border-radius:17px;
+  overflow:hidden;
+}
+
+.account-level::after{
+  content:"";
+  position:absolute;
+  width:120px;
+  height:120px;
+  left:-55px;
+  bottom:-75px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(0,255,136,.10),transparent 70%);
+  pointer-events:none;
+}
+
+.level-icon{
+  flex:none;
+  width:48px;
+  height:48px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:14px;
+  background:rgba(0,216,120,.10);
+  border:1px solid rgba(0,216,120,.18);
+  color:var(--accent-bright);
+  font-size:22px;
+}
+
+.level-content{
+  min-width:0;
+}
+
+.level-label{
+  color:var(--muted);
+  font-size:10px;
+  margin-bottom:3px;
+}
+
+.level-value{
+  color:var(--text);
+  font-size:17px;
+  font-weight:900;
+}
+
+.logout-btn{
+  width:100%;
+  min-height:47px;
+  border:1px solid rgba(255,115,115,.18);
+  border-radius:12px;
+  background:rgba(67,24,24,.55);
+  color:#ff8585;
+  font-family:inherit;
+  font-size:12px;
+  font-weight:800;
+  cursor:pointer;
+  transition:.18s ease;
+}
+
+.logout-btn:hover{
+  background:rgba(67,24,24,.8);
+  border-color:rgba(255,115,115,.3);
+}
+
+.logout-btn:active{
+  transform:scale(.985);
+}
+
+@media(max-width:480px){
+
+  .account-hero{
+    padding:21px 15px 19px;
+  }
+
+  .account-avatar{
+    width:80px;
+    height:80px;
+    font-size:25px;
+  }
+
+  .account-name{
+    font-size:19px;
+  }
+
+  .account-stat{
+    padding:14px 10px;
+  }
+
+  .account-stat-value{
+    font-size:18px;
+  }
+
+  .account-level{
+    padding:14px;
+  }
+
+}
+
+
+/* =====================================================
+   LIST
+===================================================== */
+
+.list-item{
+
+  background:var(--card);
+
+  border:
+    1px solid var(--border);
+
+  border-radius:14px;
+
+  padding:14px;
+
+  margin-bottom:10px;
+}
+
+.list-top{
+
+  display:flex;
+
+  justify-content:space-between;
+
+  gap:10px;
+
+  align-items:center;
+}
+
+.list-title{
+
+  font-weight:800;
+
+  font-size:13px;
+}
+
+.list-date{
+
+  color:var(--muted);
+
+  font-size:10px;
+}
+
+.list-info{
+
+  display:flex;
+
+  justify-content:space-between;
+
+  gap:10px;
+
+  margin-top:9px;
+
+  font-size:11px;
+
+  align-items:center;
+}
+
+.green{
+  color:var(--accent-bright);
+}
+
+.red{
+  color:#ff7777;
+}
+
+.yellow{
+  color:var(--warning);
+}
+
+.muted{
+  color:var(--muted);
+}
+
+.empty{
+
+  text-align:center;
+
+  padding:45px 15px;
+
+  color:var(--muted);
+
+  font-size:12px;
+
+  line-height:1.8;
+}
+
+.loading{
+
+  text-align:center;
+
+  padding:40px 15px;
+
+  color:var(--muted);
+
+  font-size:12px;
+}
+
+
+/* =====================================================
+   BOTTOM NAV
+===================================================== */
+
+.bottom-nav{
+
+  position:fixed;
+
+  left:0;
+  right:0;
+  bottom:0;
+
+  z-index:100;
+
+  height:
+    calc(
+      var(--nav-height) +
+      env(safe-area-inset-bottom)
+    );
+
+  padding:
+    5px
+    8px
+    env(safe-area-inset-bottom);
+
+  background:
+    rgba(8,17,12,.94);
+
+  backdrop-filter:blur(22px);
+  -webkit-backdrop-filter:blur(22px);
+
+  border-top:
+    1px solid rgba(25,51,36,.9);
+
+  display:flex;
+
+  justify-content:center;
+
+  box-shadow:
+    0 -8px 30px
+    rgba(0,0,0,.22);
+
+  padding-left:
+    max(8px, env(safe-area-inset-left));
+
+  padding-right:
+    max(8px, env(safe-area-inset-right));
+}
+
+.nav-inner{
+
+  width:100%;
+
+  max-width:700px;
+
+  display:grid;
+
+  grid-template-columns:
+    repeat(4,1fr);
+
+  gap:4px;
+}
+
+.nav-btn{
+
+  border:0;
+
+  background:transparent;
+
+  color:#66776e;
+
+  display:flex;
+
+  flex-direction:column;
+
+  align-items:center;
+
+  justify-content:center;
+
+  gap:3px;
+
+  border-radius:13px;
+
+  min-width:0;
+
+  min-height:58px;
+
+  transition:.18s ease;
+
+  position:relative;
+  overflow:hidden;
+}
+
+.nav-icon{
+
+  font-size:20px;
+
+  line-height:1;
+
+  transition:transform .18s ease;
+}
+
+.nav-label{
+
+  font-size:9px;
+
+  font-weight:600;
+}
+
+.nav-btn.active{
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(16,59,37,.9),
+      rgba(16,48,31,.65)
+    );
+
+  color:var(--accent-bright);
+}
+
+.nav-btn.active::before{
+  content:"";
+
+  position:absolute;
+
+  top:5px;
+
+  width:34px;
+  height:3px;
+
+  border-radius:20px;
+
+  background:var(--accent-bright);
+
+  opacity:.9;
+}
+
+.nav-btn.active .nav-icon{
+  transform:
+    translateY(-1px)
+    scale(1.05);
+}
+
+
+/* =====================================================
+   MODAL
+===================================================== */
+
+.modal-overlay{
+
+  position:fixed;
+
+  inset:0;
+
+  z-index:300;
+
+  display:none;
+
+  align-items:flex-end;
+
+  justify-content:center;
+
+  padding:14px;
+
+  background:
+    rgba(0,0,0,.65);
+
+  backdrop-filter:blur(5px);
+  -webkit-backdrop-filter:blur(5px);
+}
+
+.modal-overlay.show{
+  display:flex;
+}
+
+.modal{
+
+  width:100%;
+
+  max-width:430px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #102017,
+      #0b1510
+    );
+
+  border:
+    1px solid #244b34;
+
+  border-radius:22px;
+
+  padding:19px;
+
+  box-shadow:
+    0 -10px 45px
+    rgba(0,0,0,.35);
+
+  animation:
+    modalIn .2s ease;
+}
+
+@keyframes modalIn{
+
+  from{
+    opacity:0;
+    transform:translateY(18px);
+  }
+
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+
+}
+
+.modal-icon{
+
+  width:48px;
+  height:48px;
+
+  border-radius:14px;
+
+  background:#103b25;
+
+  display:flex;
+
+  align-items:center;
+  justify-content:center;
+
+  font-size:23px;
+
+  margin-bottom:12px;
+}
+
+.modal-title{
+
+  font-size:18px;
+
+  font-weight:800;
+
+  margin-bottom:5px;
+}
+
+.modal-text{
+
+  color:var(--muted);
+
+  font-size:12px;
+
+  line-height:1.8;
+
+  margin-bottom:15px;
+}
+
+.modal-product{
+
+  background:#07100c;
+
+  border:
+    1px solid var(--border);
+
+  border-radius:13px;
+
+  padding:13px;
+
+  display:flex;
+
+  justify-content:space-between;
+
+  align-items:center;
+
+  gap:10px;
+
+  margin-bottom:15px;
+}
+
+.modal-product-name{
+
+  font-size:13px;
+
+  font-weight:800;
+}
+
+.modal-product-price{
+
+  color:var(--accent-bright);
+
+  font-size:14px;
+
+  font-weight:800;
+
+  white-space:nowrap;
+}
+
+.modal-actions{
+
+  display:grid;
+
+  grid-template-columns:1fr 1fr;
+
+  gap:9px;
+}
+
+.modal-btn{
+
+  min-height:46px;
+
+  border-radius:11px;
+
+  font-weight:800;
+
+  border:1px solid var(--border);
+
+  background:#101b15;
+
+  color:var(--text-soft);
+}
+
+.modal-btn.confirm{
+
+  border-color:var(--accent);
+
+  background:var(--accent);
+
+  color:#031109;
+}
+
+
+/* =====================================================
+   TOAST
+===================================================== */
+
+.toast-container{
+
+  position:fixed;
+
+  left:14px;
+  right:14px;
+
+  bottom:
+    calc(
+      var(--nav-height) +
+      env(safe-area-inset-bottom) +
+      12px
+    );
+
+  z-index:500;
+
+  display:flex;
+
+  flex-direction:column;
+
+  align-items:center;
+
+  pointer-events:none;
+
+  gap:8px;
+}
+
+.toast{
+
+  width:min(430px,100%);
+
+  background:#122219;
+
+  border:
+    1px solid #28533a;
+
+  border-radius:13px;
+
+  padding:12px 14px;
+
+  color:#e9f5ee;
+
+  font-size:12px;
+
+  font-weight:600;
+
+  box-shadow:
+    0 10px 35px
+    rgba(0,0,0,.35);
+
+  animation:
+    toastIn .22s ease;
+}
+
+.toast.success{
+  border-color:#26754a;
+}
+
+.toast.error{
+  border-color:#703030;
+}
+
+@keyframes toastIn{
+
+  from{
+    opacity:0;
+    transform:translateY(10px);
+  }
+
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+
+}
+
+
+/* =====================================================
+   DESKTOP
+===================================================== */
+
+@media(min-width:801px){
+
+  body{
+    padding-bottom:20px;
+  }
+
+  .header{
+
+    margin-top:10px;
+
+    border:
+      1px solid var(--border);
+
+    border-radius:16px;
+  }
+
+  .bottom-nav{
+
+    position:sticky;
+
+    top:10px;
+    bottom:auto;
+
+    margin:0 auto 10px;
+
+    border:
+      1px solid var(--border);
+
+    border-radius:14px;
+
+    height:65px;
+  }
+
+  .toast-container{
+
+    bottom:20px;
+  }
+
+  .modal-overlay{
+
+    align-items:center;
+  }
+
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media(max-width:480px){
+
+  .main{
+    padding:
+      16px
+      12px
+      28px;
+  }
+
+  .page-title{
+    margin-bottom:17px;
+  }
+
+  .page-title h1{
+    font-size:22px;
+  }
+
+  .products-grid{
+    grid-template-columns:1fr;
+    gap:12px;
+  }
+
+  .product-image{
+    height:190px;
+  }
+
+  .product-content{
+    padding:15px;
+  }
+
+  .product-name{
+    font-size:16px;
+  }
+
+  .product-price{
+    font-size:23px;
+  }
+
+  .balance-value{
+    font-size:29px;
+  }
+
+}
+
+
+/* =====================================================
+   SMALL
+===================================================== */
+
+@media(max-width:380px){
+
+  .main{
+    padding:15px 12px 22px;
+  }
+
+  .product-info{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .balance-value{
+    font-size:29px;
+  }
+
+  .page-title h1{
+    font-size:21px;
+  }
+
+}
+
+
+/* =====================================================
+   REDUCED MOTION
+===================================================== */
+
+@media(prefers-reduced-motion:reduce){
+
+  *,
+  *::before,
+  *::after{
+
+    animation-duration:.01ms !important;
+
+    animation-iteration-count:1 !important;
+
+    scroll-behavior:auto !important;
+
+    transition-duration:.01ms !important;
+  }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+<div class="app">
+
+
+<header class="header">
+
+  <div class="brand">
+    GPU PLATFORM
+  </div>
+
+  <div
+    class="header-user"
+    id="headerUser"
+  >
+    جاري التحميل...
+  </div>
+
+</header>
+
+
+<main class="main">
+
+
+<!-- =====================================================
+     PRODUCTS
+===================================================== -->
+
+<section
+  class="page active"
+  id="page-products"
+>
+
+  <div class="page-title">
+
+    <h1>
+      🛒 المنتجات
+    </h1>
+
+    <p>
+      اختر آلة التعدين المناسبة لك
+    </p>
+
+  </div>
+
+  <div
+    id="productsGrid"
+    class="products-grid"
+  >
+
+    <div class="loading">
+      جاري تحميل المنتجات...
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- =====================================================
+     MY PRODUCTS
+===================================================== -->
+
+<section
+  class="page"
+  id="page-my-products"
+>
+
+  <div class="page-title">
+
+    <h1>
+      📦 منتجاتي
+    </h1>
+
+    <p>
+      آلات التعدين الخاصة بك
+    </p>
+
+  </div>
+
+  <div id="myProducts">
+
+    <div class="loading">
+      جاري تحميل منتجاتك...
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- =====================================================
+     WALLET
+===================================================== -->
+
+<section
+  class="page"
+  id="page-wallet"
+>
+
+  <div class="page-title">
+
+    <h1>
+      💰 المحفظة
+    </h1>
+
+    <p>
+      الرصيد والإيداعات والمعاملات
+    </p>
+
+  </div>
+
+
+  <div class="balance-card">
+
+    <div class="balance-label">
+      الرصيد الحالي
+    </div>
+
+    <div
+      class="balance-value"
+      id="walletBalance"
+    >
+      0.00
+    </div>
+
+  </div>
+
+
+  <div class="wallet-actions">
+
+    <button
+      class="action-btn green"
+      type="button"
+      onclick="openWalletTab('deposit')"
+    >
+      + إيداع
+    </button>
+
+    <button
+      class="action-btn"
+      type="button"
+      onclick="showWithdrawalInfo()"
+    >
+      ↑ سحب
+    </button>
+
+  </div>
+
+
+  <div class="wallet-tabs">
+
+    <button
+      class="wallet-tab active"
+      data-wallet-tab="deposit"
+      type="button"
+    >
+      الإيداع
+    </button>
+
+    <button
+      class="wallet-tab"
+      data-wallet-tab="deposits"
+      type="button"
+    >
+      إيداعاتي
+    </button>
+
+    <button
+      class="wallet-tab"
+      data-wallet-tab="transactions"
+      type="button"
+    >
+      المعاملات
+    </button>
+
+  </div>
+
+
+  <div
+    class="wallet-content active"
+    id="wallet-deposit"
+  >
+
+    <div class="panel">
+
+      <div class="panel-header">
+        💰 إنشاء طلب إيداع
+      </div>
+
+      <div class="panel-body">
+
+        <div
+          class="alert"
+          id="depositAlert"
+        ></div>
+
+
+        <form id="depositForm">
+
+          <div class="form-group">
+
+            <label>
+              طريقة الإيداع
+            </label>
+
+            <select
+              id="paymentMethod"
+              required
+            >
+
+              <option value="">
+                جاري التحميل...
+              </option>
+
+            </select>
+
+          </div>
+
+
+          <div
+            class="payment-info"
+            id="paymentInfo"
+          >
+
+            <div class="payment-row">
+
+              <div class="payment-label">
+                اسم الطريقة
+              </div>
+
+              <div id="methodName">
+                -
+              </div>
+
+            </div>
+
+
+            <div class="payment-row">
+
+              <div class="payment-label">
+                الشبكة
+              </div>
+
+              <div
+                class="green"
+                id="methodNetwork"
+              >
+                -
+              </div>
+
+            </div>
+
+
+            <div class="payment-row">
+
+              <div class="payment-label">
+                عنوان التحويل
+              </div>
+
+              <div
+                class="wallet-address"
+                id="walletAddress"
+              >
+                -
+              </div>
+
+              <button
+                type="button"
+                class="action-btn"
+                id="copyAddress"
+                style="margin-top:7px;width:100%;"
+              >
+                نسخ العنوان
+              </button>
+
+            </div>
+
+
+            <div class="payment-row">
+
+              <div class="payment-label">
+                التعليمات
+              </div>
+
+              <div
+                class="instructions"
+                id="instructions"
+              >
+                -
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label>
+              المبلغ
+            </label>
+
+            <input
+              type="number"
+              id="depositAmount"
+              min="0.01"
+              step="0.01"
+              inputmode="decimal"
+              placeholder="مثال: 100"
+              required
+            >
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label>
+              إثبات التحويل
+            </label>
+
+            <input
+              type="file"
+              id="proof"
+              accept="image/*"
+              required
+            >
+
+          </div>
+
+
+          <button
+            class="submit"
+            type="submit"
+            id="submitDeposit"
+          >
+            إرسال طلب الإيداع
+          </button>
+
+        </form>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div
+    class="wallet-content"
+    id="wallet-deposits"
+  >
+
+    <div id="depositsList">
+
+      <div class="loading">
+        جاري التحميل...
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div
+    class="wallet-content"
+    id="wallet-transactions"
+  >
+
+    <div id="transactionsList">
+
+      <div class="loading">
+        جاري التحميل...
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- =====================================================
+     ACCOUNT
+===================================================== -->
+
+<section class="page" id="page-account">
+
+  <div class="page-title">
+    <h1>👤 حسابي</h1>
+    <p>إدارة ومتابعة حسابك</p>
+  </div>
+
+  <div class="account-hero">
+
+    <div class="account-avatar" id="accountAvatar">
+      ?
+    </div>
+
+    <div class="account-name" id="accountName">
+      جاري التحميل...
+    </div>
+
+    <div class="account-email" id="accountEmail">
+      -
+    </div>
+
+  </div>
+
+  <div class="account-stats">
+
+    <div class="account-stat">
+      <div class="account-stat-icon">💰</div>
+      <div class="account-stat-label">الرصيد</div>
+      <div class="account-stat-value green" id="profileBalance">
+        0.00
+      </div>
+    </div>
+
+    <div class="account-stat">
+      <div class="account-stat-icon">⚡</div>
+      <div class="account-stat-label">آلاتك</div>
+      <div class="account-stat-value" id="profileProductsCount">
+        0
+      </div>
+    </div>
+
+  </div>
+
+  <div class="account-level">
+
+    <div class="level-icon">⚡</div>
+
+    <div class="level-content">
+      <div class="level-label">مستوى التعدين</div>
+      <div class="level-value" id="profileLevel">
+        لم تبدأ التعدين بعد
+      </div>
+    </div>
+
+  </div>
+
+  <button class="logout-btn" id="logoutBtn" type="button">
+    🚪 تسجيل الخروج
+  </button>
+
+</section>
+
+
+</main>
+
+
+<!-- =====================================================
+     BOTTOM NAV
+===================================================== -->
+
+<nav class="bottom-nav">
+
+  <div class="nav-inner">
+
+    <button
+      class="nav-btn active"
+      data-page="products"
+      type="button"
+    >
+
+      <span class="nav-icon">
+        🛒
+      </span>
+
+      <span class="nav-label">
+        المنتجات
+      </span>
+
+    </button>
+
+
+    <button
+      class="nav-btn"
+      data-page="my-products"
+      type="button"
+    >
+
+      <span class="nav-icon">
+        📦
+      </span>
+
+      <span class="nav-label">
+        منتجاتي
+      </span>
+
+    </button>
+
+
+    <button
+      class="nav-btn"
+      data-page="wallet"
+      type="button"
+    >
+
+      <span class="nav-icon">
+        💰
+      </span>
+
+      <span class="nav-label">
+        المحفظة
+      </span>
+
+    </button>
+
+
+    <button
+      class="nav-btn"
+      data-page="account"
+      type="button"
+    >
+
+      <span class="nav-icon">
+        👤
+      </span>
+
+      <span class="nav-label">
+        حسابي
+      </span>
+
+    </button>
+
+  </div>
+
+</nav>
+
+
+<!-- =====================================================
+     PURCHASE MODAL
+===================================================== -->
+
+<div
+  class="modal-overlay"
+  id="purchaseModal"
+>
+
+  <div class="modal">
+
+    <div class="modal-icon">
+      🛒
+    </div>
+
+    <div class="modal-title">
+      تأكيد الشراء
+    </div>
+
+    <div class="modal-text">
+      راجع بيانات المنتج قبل إتمام عملية الشراء.
+    </div>
+
+    <div class="modal-product">
+
+      <div
+        class="modal-product-name"
+        id="modalProductName"
+      >
+        -
+      </div>
+
+      <div
+        class="modal-product-price"
+        id="modalProductPrice"
+      >
+        0.00
+      </div>
+
+    </div>
+
+    <div class="modal-actions">
+
+      <button
+        class="modal-btn"
+        type="button"
+        id="cancelPurchase"
+      >
+        إلغاء
+      </button>
+
+      <button
+        class="modal-btn confirm"
+        type="button"
+        id="confirmPurchase"
+      >
+        تأكيد الشراء
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- =====================================================
+     TOAST
+===================================================== -->
+
+<div
+  class="toast-container"
+  id="toastContainer"
+></div>
+
+
+</div>
+
+
+<script>
+
+"use strict";
+
+
+/* =====================================================
+   AUTH
+===================================================== */
+
+const token =
+  localStorage.getItem(
+    "authToken"
+  );
+
+
+if(!token){
+
+  window.location.href =
+    "/login.html";
+
+}
+
+
+/* =====================================================
+   API
+===================================================== */
+
+async function api(
+  url,
+  options = {}
+){
+
+  options.headers =
+    options.headers || {};
+
+  options.headers.Authorization =
+    `Bearer ${token}`;
+
+
+  const response =
+    await fetch(
+      url,
+      options
+    );
+
+
+  let data = {};
+
+  try{
+
+    data =
+      await response.json();
+
+  }catch{
+
+    data = {};
+
+  }
+
+
+  if(
+    response.status === 401 ||
+    response.status === 403
+  ){
+
+    localStorage.removeItem(
+      "authToken"
+    );
+
+    localStorage.removeItem(
+      "user"
+    );
+
+    window.location.href =
+      "/login.html";
+
+    throw new Error(
+      "انتهت الجلسة"
+    );
+
+  }
+
+
+  if(!response.ok){
+
+    throw new Error(
+      data.message ||
+      "حدث خطأ"
+    );
+
+  }
+
+
+  return data;
+
+}
+
+
+/* =====================================================
+   SITE SETTINGS
+===================================================== */
+
+let siteSettings = null;
+
+
+async function loadSiteSettings(){
+
+  try{
+
+    const data =
+      await api(
+        "/api/user/settings"
+      );
+
+
+    siteSettings =
+      data.settings || null;
+
+
+    if(!siteSettings){
+      return;
+    }
+
+
+    applySiteSettings(
+      siteSettings
+    );
+
+  }catch(error){
+
+    console.error(
+      "Settings load error:",
+      error
+    );
+
+  }
+
+}
+
+
+function applySiteSettings(settings){
+
+  const root =
+    document.documentElement;
+
+
+  const theme =
+    settings.theme || {};
+
+
+  const typography =
+    settings.typography || {};
+
+
+  const site =
+    settings.site || {};
+
+
+  /* ===== COLORS ===== */
+
+  if(theme.primary){
+
+    root.style.setProperty(
+      "--accent",
+      theme.primary
+    );
+
+  }
+
+
+  if(theme.primaryBright){
+
+    root.style.setProperty(
+      "--accent-bright",
+      theme.primaryBright
+    );
+
+  }
+
+
+  if(theme.secondary){
+
+    root.style.setProperty(
+      "--accent-soft",
+      theme.secondary
+    );
+
+  }
+
+
+  if(theme.background){
+
+    root.style.setProperty(
+      "--bg",
+      theme.background
+    );
+
+  }
+
+
+  if(theme.backgroundSoft){
+
+    root.style.setProperty(
+      "--bg-soft",
+      theme.backgroundSoft
+    );
+
+  }
+
+
+  if(theme.card){
+
+    root.style.setProperty(
+      "--card",
+      theme.card
+    );
+
+  }
+
+
+  if(theme.cardSecondary){
+
+    root.style.setProperty(
+      "--card-2",
+      theme.cardSecondary
+    );
+
+  }
+
+
+  if(theme.border){
+
+    root.style.setProperty(
+      "--border",
+      theme.border
+    );
+
+  }
+
+
+  if(theme.borderSoft){
+
+    root.style.setProperty(
+      "--border-soft",
+      theme.borderSoft
+    );
+
+  }
+
+
+  if(theme.text){
+
+    root.style.setProperty(
+      "--text",
+      theme.text
+    );
+
+  }
+
+
+  if(theme.textSoft){
+
+    root.style.setProperty(
+      "--text-soft",
+      theme.textSoft
+    );
+
+  }
+
+
+  if(theme.muted){
+
+    root.style.setProperty(
+      "--muted",
+      theme.muted
+    );
+
+  }
+
+
+  if(theme.danger){
+
+    root.style.setProperty(
+      "--danger",
+      theme.danger
+    );
+
+  }
+
+
+  if(theme.warning){
+
+    root.style.setProperty(
+      "--warning",
+      theme.warning
+    );
+
+  }
+
+
+  /* ===== RADIUS ===== */
+
+  if(theme.radius !== undefined){
+
+    root.style.setProperty(
+      "--radius",
+      `${Number(theme.radius) || 18}px`
+    );
+
+  }
+
+
+  /* ===== TYPOGRAPHY ===== */
+
+  if(typography.fontFamily){
+
+    root.style.setProperty(
+      "--site-font",
+      `"${typography.fontFamily}"`
+    );
+
+  }
+
+
+  if(typography.baseFontSize){
+
+    const size =
+      Number(
+        typography.baseFontSize
+      );
+
+
+    root.style.setProperty(
+      "--base-font-size",
+      `${size}px`
+    );
+
+
+    document.body.style.fontSize =
+      `${size}px`;
+
+  }
+
+
+  if(typography.fontWeight){
+
+    document.body.style.fontWeight =
+      String(
+        typography.fontWeight
+      );
+
+  }
+
+
+  /* ===== SITE ===== */
+
+  if(site.name){
+
+    document.title =
+      site.name;
+
+  }
+
+}
+
+
+/* =====================================================
+   GLOBAL
+===================================================== */
+
+let currentUser = null;
+
+let products = [];
+
+let myProducts = [];
+
+let paymentMethods = [];
+
+let pendingPurchaseId = null;
+
+
+/* =====================================================
+   HELPERS
+===================================================== */
+
+function escapeHtml(value){
+
+  return String(
+    value ?? ""
+  )
+  .replaceAll("&","&amp;")
+  .replaceAll("<","&lt;")
+  .replaceAll(">","&gt;")
+  .replaceAll('"',"&quot;")
+  .replaceAll("'","&#039;");
+
+}
+
+
+function money(value){
+
+  return Number(
+    value || 0
+  ).toFixed(2);
+
+}
+
+
+function formatDate(value){
+
+  if(!value){
+    return "-";
+  }
+
+  const date =
+    new Date(value);
+
+  if(
+    Number.isNaN(
+      date.getTime()
+    )
+  ){
+    return "-";
+  }
+
+  const pad =
+    number =>
+      String(number).padStart(2,"0");
+
+  return (
+    `${pad(date.getDate())}/` +
+    `${pad(date.getMonth() + 1)}/` +
+    `${date.getFullYear()} ` +
+    `${pad(date.getHours())}:` +
+    `${pad(date.getMinutes())}`
+  );
+
+}
+
+
+function getProductLevel(product){
+
+  if(!product){
+    return 0;
+  }
+
+  if(
+    Number.isFinite(
+      Number(product.level)
+    )
+  ){
+
+    return Number(product.level);
+
+  }
+
+
+  const text =
+    String(
+      product.name || ""
+    );
+
+
+  const match =
+    text.match(
+      /level\s*[-_]?\s*(\d+)/i
+    );
+
+
+  if(match){
+    return Number(match[1]);
+  }
+
+
+  const arabicMatch =
+    text.match(
+      /ليفل\s*[-_]?\s*(\d+)/i
+    );
+
+
+  if(arabicMatch){
+    return Number(arabicMatch[1]);
+  }
+
+
+  return 0;
+
+}
+
+
+function getHighestLevel(){
+
+  let highest = 0;
+
+  myProducts.forEach(item => {
+
+    if(!item || !item.product){
+      return;
+    }
+
+    const level =
+      getProductLevel(
+        item.product
+      );
+
+    if(level > highest){
+      highest = level;
+    }
+
+  });
+
+  return highest;
+
+}
+
+
+function getInitials(name){
+
+  const text =
+    String(
+      name || "U"
+    ).trim();
+
+  if(!text){
+    return "U";
+  }
+
+  const parts =
+    text.split(/\s+/);
+
+  if(parts.length >= 2){
+
+    return (
+      parts[0].charAt(0) +
+      parts[1].charAt(0)
+    ).toUpperCase();
+
+  }
+
+  return text
+    .charAt(0)
+    .toUpperCase();
+
+}
+
+
+function formatSeconds(seconds){
+
+  seconds =
+    Math.max(
+      0,
+      Number(seconds || 0)
+    );
+
+  const hours =
+    Math.floor(
+      seconds / 3600
+    );
+
+  const minutes =
+    Math.floor(
+      (seconds % 3600) / 60
+    );
+
+  const secs =
+    Math.floor(
+      seconds % 60
+    );
+
+  return (
+    String(hours).padStart(2,"0") +
+    ":" +
+    String(minutes).padStart(2,"0") +
+    ":" +
+    String(secs).padStart(2,"0")
+  );
+
+}
+
+
+/* =====================================================
+   TOAST
+===================================================== */
+
+function showToast(
+  message,
+  type = "success"
+){
+
+  const container =
+    document.getElementById(
+      "toastContainer"
+    );
+
+  const toast =
+    document.createElement(
+      "div"
+    );
+
+  toast.className =
+    `toast ${type}`;
+
+  toast.textContent =
+    message;
+
+  container.appendChild(
+    toast
+  );
+
+  setTimeout(
+    () => {
+
+      toast.style.opacity =
+        "0";
+
+      toast.style.transform =
+        "translateY(8px)";
+
+      setTimeout(
+        () => toast.remove(),
+        220
+      );
+
+    },
+    2600
+  );
+
+}
+
+
+/* =====================================================
+   NAVIGATION
+===================================================== */
+
+function showPage(name){
+
+  document
+    .querySelectorAll(".page")
+    .forEach(page => {
+
+      page.classList.toggle(
+        "active",
+        page.id ===
+          `page-${name}`
+      );
+
+    });
+
+
+  document
+    .querySelectorAll(".nav-btn")
+    .forEach(button => {
+
+      button.classList.toggle(
+        "active",
+        button.dataset.page === name
+      );
+
+    });
+
+
+  window.scrollTo({
+    top:0,
+    left:0,
+    behavior:"auto"
+  });
+
+
+  if(name === "products"){
+    loadProducts();
+  }
+
+
+  if(name === "my-products"){
+    loadMyProducts();
+  }
+
+
+  if(name === "wallet"){
+    loadWallet();
+  }
+
+
+  if(name === "account"){
+
+    loadProfile();
+
+    loadMyProducts(true);
+
+  }
+
+}
+
+
+document
+  .querySelectorAll(".nav-btn")
+  .forEach(button => {
+
+    button.addEventListener(
+      "click",
+      () => {
+
+        showPage(
+          button.dataset.page
+        );
+
+      }
+    );
+
+  });
+
+
+/* =====================================================
+   PROFILE
+===================================================== */
+
+async function loadProfile(){
+
+  try{
+
+    const data =
+      await api(
+        "/api/user/me"
+      );
+
+
+    currentUser =
+      data.user;
+
+
+    const name =
+      currentUser.name ||
+      "مستخدم";
+
+
+    const email =
+      currentUser.email ||
+      "-";
+
+
+    document.getElementById(
+      "headerUser"
+    ).textContent =
+      name;
+
+
+    document.getElementById(
+      "accountName"
+    ).textContent =
+      name;
+
+
+    document.getElementById(
+      "accountEmail"
+    ).textContent =
+      email;
+
+
+    document.getElementById(
+      "profileBalance"
+    ).textContent =
+      money(
+        currentUser.balance
+      );
+
+
+    document.getElementById(
+      "accountAvatar"
+    ).textContent =
+      getInitials(name);
+
+
+  }catch(error){
+
+    console.error(error);
+
+  }
+
+}
+
+
+/* =====================================================
+   PRODUCTS
+===================================================== */
+
+async function loadProducts(){
+
+  const container =
+    document.getElementById(
+      "productsGrid"
+    );
+
+
+  container.innerHTML =
+    `<div class="loading">
+      جاري تحميل المنتجات...
+    </div>`;
+
+
+  try{
+
+    const data =
+      await api(
+        "/api/user/products"
+      );
+
+
+    products =
+      Array.isArray(
+        data.products
+      )
+        ? data.products
+        : [];
+
+
+    if(
+      products.length === 0
+    ){
+
+      container.innerHTML =
+        `<div class="empty">
+          لا توجد منتجات متاحة حاليًا
+        </div>`;
+
+      return;
+
+    }
+
+
+    container.innerHTML =
+      products
+      .map(
+        product => {
+
+          const hasImage =
+            Boolean(
+              product.image
+            );
+
+
+          return `
+
+            <article class="product-card">
+
+              <div class="product-image">
+
+                ${
+                  hasImage
+
+                    ? `
+                      <img
+                        src="${escapeHtml(product.image)}"
+                        alt="${escapeHtml(product.name)}"
+                        loading="lazy"
+                      >
+                    `
+
+                    : "⚡"
+                }
+
+              </div>
+
+
+              <div class="product-content">
+
+                <div class="product-name">
+                  ${escapeHtml(
+                    product.name
+                  )}
+                </div>
+
+
+                <div class="product-price">
+                  ${money(
+                    product.price
+                  )}
+                </div>
+
+
+                <div class="product-info">
+
+                  <div class="info-box">
+
+                    <div class="info-label">
+                      Hashrate
+                    </div>
+
+                    <div class="info-value">
+                      ${escapeHtml(
+                        product.hashrate ||
+                        "-"
+                      )}
+                    </div>
+
+                  </div>
+
+
+                  <div class="info-box">
+
+                    <div class="info-label">
+                      الطاقة
+                    </div>
+
+                    <div class="info-value">
+                      ${escapeHtml(
+                        product.power ||
+                        "-"
+                      )}
+                    </div>
+
+                  </div>
+
+
+                  <div class="info-box">
+
+                    <div class="info-label">
+                      المكافأة
+                    </div>
+
+                    <div class="info-value green">
+                      ${money(
+                        product.rewardRate
+                      )}
+                    </div>
+
+                  </div>
+
+
+                  <div class="info-box">
+
+                    <div class="info-label">
+                      كل
+                    </div>
+
+                    <div class="info-value">
+                      ${escapeHtml(
+                        String(
+                          product.rewardInterval
+                        )
+                      )} ثانية
+                    </div>
+
+                  </div>
+
+                </div>
+
+
+                <button
+                  class="buy-btn"
+                  type="button"
+                  data-buy-id="${product._id}"
+                >
+                  شراء المنتج
+                </button>
+
+              </div>
+
+            </article>
+
+          `;
+
+        }
+      )
+      .join("");
+
+
+    container
+      .querySelectorAll(
+        "[data-buy-id]"
+      )
+      .forEach(button => {
+
+        button.addEventListener(
+          "click",
+          () => {
+
+            openPurchaseModal(
+              button.dataset.buyId
+            );
+
+          }
+        );
+
+      });
+
+
+  }catch(error){
+
+    container.innerHTML =
+      `<div class="empty">
+        ${escapeHtml(
+          error.message ||
+          "فشل تحميل المنتجات"
+        )}
+      </div>`;
+
+  }
+
+}
+
+
+/* =====================================================
+   PURCHASE MODAL
+===================================================== */
+
+function openPurchaseModal(id){
+
+  const product =
+    products.find(
+      item =>
+        String(item._id) ===
+        String(id)
+    );
+
+
+  if(!product){
+    return;
+  }
+
+
+  pendingPurchaseId =
+    id;
+
+
+  document.getElementById(
+    "modalProductName"
+  ).textContent =
+    product.name ||
+    "المنتج";
+
+
+  document.getElementById(
+    "modalProductPrice"
+  ).textContent =
+    money(
+      product.price
+    );
+
+
+  document.getElementById(
+    "purchaseModal"
+  ).classList.add(
+    "show"
+  );
+
+
+  document.body.style.overflow =
+    "hidden";
+
+}
+
+
+function closePurchaseModal(){
+
+  document.getElementById(
+    "purchaseModal"
+  ).classList.remove(
+    "show"
+  );
+
+
+  document.body.style.overflow =
+    "";
+
+
+  pendingPurchaseId =
+    null;
+
+}
+
+
+document.getElementById(
+  "cancelPurchase"
+).addEventListener(
+  "click",
+  closePurchaseModal
+);
+
+
+document.getElementById(
+  "purchaseModal"
+).addEventListener(
+  "click",
+  event => {
+
+    if(
+      event.target.id ===
+      "purchaseModal"
+    ){
+
+      closePurchaseModal();
+
+    }
+
+  }
+);
+
+
+document.getElementById(
+  "confirmPurchase"
+).addEventListener(
+  "click",
+  async () => {
+
+    if(!pendingPurchaseId){
+      return;
+    }
+
+
+    const id =
+      pendingPurchaseId;
+
+
+    const product =
+      products.find(
+        item =>
+          String(item._id) ===
+          String(id)
+      );
+
+
+    const button =
+      document.getElementById(
+        "confirmPurchase"
+      );
+
+
+    button.disabled =
+      true;
+
+    button.textContent =
+      "جاري الشراء...";
+
+
+    try{
+
+      const data =
+        await api(
+          `/api/user/products/${id}/purchase`,
+          {
+            method:"POST"
+          }
+        );
+
+
+      closePurchaseModal();
+
+
+      showToast(
+        data.message ||
+        "تم شراء المنتج بنجاح",
+        "success"
+      );
+
+
+      await Promise.all([
+        loadProducts(),
+        loadMyProducts(),
+        loadWallet(),
+        loadProfile()
+      ]);
+
+
+      setTimeout(
+        () => {
+
+          showPage(
+            "my-products"
+          );
+
+        },
+        250
+      );
+
+
+    }catch(error){
+
+      showToast(
+        error.message ||
+        "تعذر شراء المنتج",
+        "error"
+      );
+
+    }finally{
+
+      button.disabled =
+        false;
+
+      button.textContent =
+        "تأكيد الشراء";
+
+    }
+
+  }
+);
+
+
+/* =====================================================
+   MY PRODUCTS
+===================================================== */
+
+async function loadMyProducts(
+  silent = false
+){
+
+  const container =
+    document.getElementById(
+      "myProducts"
+    );
+
+
+  if(!silent){
+
+    container.innerHTML =
+      `<div class="loading">
+        جاري تحميل منتجاتك...
+      </div>`;
+
+  }
+
+
+  try{
+
+    const data =
+      await api(
+        "/api/user/products/my"
+      );
+
+
+    myProducts =
+      Array.isArray(
+        data.products
+      )
+        ? data.products
+        : [];
+
+
+    document.getElementById(
+      "profileProductsCount"
+    ).textContent =
+      myProducts.length;
+
+
+    const highestLevel =
+      getHighestLevel();
+
+
+    document.getElementById(
+      "profileLevel"
+    ).textContent =
+      highestLevel > 0
+        ? `Level ${highestLevel}`
+        : "لم تبدأ التعدين بعد";
+
+
+    if(
+      silent
+    ){
+
+      updateTimers();
+
+      return;
+
+    }
+
+
+    if(
+      myProducts.length === 0
+    ){
+
+      container.innerHTML =
+        `<div class="empty">
+
+          لا توجد آلات لديك حتى الآن.
+
+          <br><br>
+
+          يمكنك الذهاب إلى
+          <b class="green">
+            المنتجات
+          </b>
+          لشراء آلة التعدين.
+
+        </div>`;
+
+      return;
+
+    }
+
+
+    container.innerHTML =
+      myProducts
+      .map(
+        item => {
+
+          const product =
+            item.product;
+
+
+          if(!product){
+            return "";
+          }
+
+
+          const level =
+            getProductLevel(product);
+
+
+          const max =
+            Number(
+              product.maxReward || 0
+            );
+
+
+          const earned =
+            Number(
+              item.earnedReward || 0
+            );
+
+
+          const percent =
+            max > 0
+              ? Math.min(
+                  100,
+                  (
+                    earned /
+                    max
+                  ) * 100
+                )
+              : 0;
+
+
+          const status =
+            item.status ||
+            "active";
+
+
+          return `
+
+            <article
+              class="my-product"
+              data-id="${item._id}"
+            >
+
+              <div class="my-product-top">
+
+                <div>
+
+                  <div class="my-product-name">
+
+                    ${escapeHtml(
+                      product.name
+                    )}
+
+                  </div>
+
+                  ${
+                    level > 0
+                      ? `
+                        <div
+                          style="
+                            margin-top:4px;
+                            color:var(--accent-bright);
+                            font-size:10px;
+                            font-weight:700;
+                          "
+                        >
+                          ⚡ Level ${level}
+                        </div>
+                      `
+                      : ""
+                  }
+
+                </div>
+
+
+                <span
+                  class="badge ${
+                    status === "active"
+                      ? "badge-active"
+                      : status === "completed"
+                        ? "badge-completed"
+                        : "badge-stopped"
+                  }"
+                >
+
+                  ${
+                    status === "active"
+                      ? "يعمل"
+                      : status === "completed"
+                        ? "مكتمل"
+                        : "متوقف"
+                  }
+
+                </span>
+
+              </div>
+
+
+              <div class="reward-box">
+
+                <div class="reward-line">
+
+                  <span class="reward-label">
+                    سعر الشراء
+                  </span>
+
+                  <span class="reward-value">
+                    ${money(
+                      item.purchasePrice
+                    )}
+                  </span>
+
+                </div>
+
+
+                <div class="reward-line">
+
+                  <span class="reward-label">
+                    المكافآت المحصلة
+                  </span>
+
+                  <span
+                    class="reward-value green"
+                  >
+                    ${money(
+                      earned
+                    )}
+                  </span>
+
+                </div>
+
+
+                <div class="reward-line">
+
+                  <span class="reward-label">
+                    الحد الأقصى
+                  </span>
+
+                  <span class="reward-value">
+                    ${money(
+                      max
+                    )}
+                  </span>
+
+                </div>
+
+
+                <div class="progress">
+
+                  <div
+                    class="progress-bar"
+                    style="width:${percent}%"
+                  ></div>
+
+                </div>
+
+
+                <div class="reward-line">
+
+                  <span class="reward-label">
+                    المكافأة القادمة
+                  </span>
+
+                  <span
+                    class="timer"
+                    data-last="${item.lastRewardAt}"
+                    data-interval="${product.rewardInterval}"
+                    data-status="${status}"
+                  >
+                    حساب...
+                  </span>
+
+                </div>
+
+
+                <button
+                  class="claim-btn"
+                  type="button"
+                  onclick="claimReward('${item._id}')"
+                  ${status !== "active" ? "disabled" : ""}
+                >
+                  تحصيل المكافأة
+                </button>
+
+              </div>
+
+
+              <div
+                class="muted"
+                style="
+                  font-size:10px;
+                  margin-top:10px;
+                "
+              >
+                تم الشراء:
+                ${formatDate(
+                  item.purchasedAt
+                )}
+              </div>
+
+            </article>
+
+          `;
+
+        }
+      )
+      .join("");
+
+
+    updateTimers();
+
+  }catch(error){
+
+    if(!silent){
+
+      container.innerHTML =
+        `<div class="empty">
+          ${escapeHtml(
+            error.message ||
+            "فشل تحميل منتجاتك"
+          )}
+        </div>`;
+
+    }
+
+  }
+
+}
+
+
+/* =====================================================
+   TIMER
+===================================================== */
+
+function updateTimers(){
+
+  document
+    .querySelectorAll(".timer")
+    .forEach(timer => {
+
+      const status =
+        timer.dataset.status;
+
+
+      if(
+        status !== "active"
+      ){
+
+        timer.textContent =
+          status === "completed"
+            ? "مكتمل"
+            : "متوقف";
+
+        return;
+
+      }
+
+
+      const last =
+        new Date(
+          timer.dataset.last
+        );
+
+
+      const interval =
+        Number(
+          timer.dataset.interval
+        );
+
+
+      if(
+        Number.isNaN(
+          last.getTime()
+        ) ||
+        !Number.isFinite(interval)
+      ){
+
+        timer.textContent =
+          "--:--:--";
+
+        return;
+
+      }
+
+
+      const next =
+        last.getTime() +
+        interval * 1000;
+
+
+      const remaining =
+        Math.max(
+          0,
+          Math.ceil(
+            (
+              next -
+              Date.now()
+            ) / 1000
+          )
+        );
+
+
+      if(remaining <= 0){
+
+        timer.textContent =
+          "متاحة الآن ✓";
+
+      }else{
+
+        timer.textContent =
+          formatSeconds(
+            remaining
+          );
+
+      }
+
+    });
+
+}
+
+
+setInterval(
+  updateTimers,
+  1000
+);
+
+
+/* =====================================================
+   CLAIM
+===================================================== */
+
+async function claimReward(id){
+
+  try{
+
+    const data =
+      await api(
+        `/api/user/products/${id}/claim`,
+        {
+          method:"POST"
+        }
+      );
+
+
+    if(
+      data.success
+    ){
+
+      showToast(
+        data.reward > 0
+
+          ? `تمت إضافة ${money(data.reward)} إلى المحفظة`
+
+          : (
+              data.message ||
+              "لا توجد مكافأة متاحة حاليًا"
+            ),
+
+        data.reward > 0
+          ? "success"
+          : "error"
+      );
+
+    }
+
+
+    await Promise.all([
+      loadMyProducts(),
+      loadWallet(),
+      loadProfile()
+    ]);
+
+  }catch(error){
+
+    showToast(
+      error.message ||
+      "لا توجد مكافأة متاحة حاليًا",
+      "error"
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   WALLET
+===================================================== */
+
+async function loadWallet(){
+
+  try{
+
+    const data =
+      await api(
+        "/api/user/wallet"
+      );
+
+
+    const balance =
+      Number(
+        data.balance || 0
+      );
+
+
+    document.getElementById(
+      "walletBalance"
+    ).textContent =
+      money(balance);
+
+
+    document.getElementById(
+      "profileBalance"
+    ).textContent =
+      money(balance);
+
+  }catch(error){
+
+    console.error(error);
+
+  }
+
+
+  await loadPaymentMethods();
+
+}
+
+
+/* =====================================================
+   PAYMENT METHODS
+===================================================== */
+
+async function loadPaymentMethods(){
+
+  const select =
+    document.getElementById(
+      "paymentMethod"
+    );
+
+
+  try{
+
+    const data =
+      await api(
+        "/api/user/payment-methods"
+      );
+
+
+    paymentMethods =
+      Array.isArray(
+        data.methods
+      )
+        ? data.methods
+        : [];
+
+
+    select.innerHTML =
+      `<option value="">
+        اختر طريقة الإيداع
+      </option>`;
+
+
+    paymentMethods.forEach(
+      method => {
+
+        const option =
+          document.createElement(
+            "option"
+          );
+
+
+        option.value =
+          method._id;
+
+
+        option.textContent =
+          method.network
+            ? `${method.name} - ${method.network}`
+            : method.name;
+
+
+        select.appendChild(
+          option
+        );
+
+      }
+    );
+
+
+  }catch(error){
+
+    select.innerHTML =
+      `<option value="">
+        فشل تحميل طرق الإيداع
+      </option>`;
+
+  }
+
+}
+
+
+/* =====================================================
+   PAYMENT CHANGE
+===================================================== */
+
+document
+  .getElementById(
+    "paymentMethod"
+  )
+  .addEventListener(
+    "change",
+    event => {
+
+      const method =
+        paymentMethods.find(
+          item =>
+            String(item._id) ===
+            String(
+              event.target.value
+            )
+        );
+
+
+      const box =
+        document.getElementById(
+          "paymentInfo"
+        );
+
+
+      if(!method){
+
+        box.classList.remove(
+          "show"
+        );
+
+        return;
+
+      }
+
+
+      document.getElementById(
+        "methodName"
+      ).textContent =
+        method.name || "-";
+
+
+      document.getElementById(
+        "methodNetwork"
+      ).textContent =
+        method.network || "-";
+
+
+      document.getElementById(
+        "walletAddress"
+      ).textContent =
+        method.walletAddress || "-";
+
+
+      document.getElementById(
+        "instructions"
+      ).textContent =
+        method.instructions ||
+        "لا توجد تعليمات إضافية";
+
+
+      box.classList.add(
+        "show"
+      );
+
+    }
+  );
+
+
+/* =====================================================
+   COPY
+===================================================== */
+
+document
+  .getElementById(
+    "copyAddress"
+  )
+  .addEventListener(
+    "click",
+    async () => {
+
+      const address =
+        document.getElementById(
+          "walletAddress"
+        ).textContent.trim();
+
+
+      if(
+        !address ||
+        address === "-"
+      ){
+
+        return;
+
+      }
+
+
+      try{
+
+        await navigator.clipboard.writeText(
+          address
+        );
+
+
+        showToast(
+          "تم نسخ عنوان التحويل ✓",
+          "success"
+        );
+
+      }catch{
+
+        showToast(
+          "تعذر نسخ العنوان",
+          "error"
+        );
+
+      }
+
+    }
+  );
+
+
+/* =====================================================
+   DEPOSIT
+===================================================== */
+
+document
+  .getElementById(
+    "depositForm"
+  )
+  .addEventListener(
+    "submit",
+    async event => {
+
+      event.preventDefault();
+
+
+      const alertBox =
+        document.getElementById(
+          "depositAlert"
+        );
+
+
+      alertBox.className =
+        "alert";
+
+
+      const methodId =
+        document.getElementById(
+          "paymentMethod"
+        ).value;
+
+
+      const amount =
+        Number(
+          document.getElementById(
+            "depositAmount"
+          ).value
+        );
+
+
+      const proof =
+        document.getElementById(
+          "proof"
+        ).files[0];
+
+
+      if(!methodId){
+
+        alertBox.textContent =
+          "اختر طريقة الإيداع";
+
+        alertBox.className =
+          "alert show error";
+
+        return;
+
+      }
+
+
+      if(
+        !Number.isFinite(amount) ||
+        amount <= 0
+      ){
+
+        alertBox.textContent =
+          "أدخل مبلغ صحيح";
+
+        alertBox.className =
+          "alert show error";
+
+        return;
+
+      }
+
+
+      if(!proof){
+
+        alertBox.textContent =
+          "ارفع صورة إثبات التحويل";
+
+        alertBox.className =
+          "alert show error";
+
+        return;
+
+      }
+
+
+      if(
+        !proof.type.startsWith(
+          "image/"
+        )
+      ){
+
+        alertBox.textContent =
+          "الملف يجب أن يكون صورة";
+
+        alertBox.className =
+          "alert show error";
+
+        return;
+
+      }
+
+
+      if(
+        proof.size >
+        5 * 1024 * 1024
+      ){
+
+        alertBox.textContent =
+          "حجم الصورة يجب ألا يتجاوز 5MB";
+
+        alertBox.className =
+          "alert show error";
+
+        return;
+
+      }
+
+
+      const button =
+        document.getElementById(
+          "submitDeposit"
+        );
+
+
+      button.disabled =
+        true;
+
+
+      button.textContent =
+        "جاري الإرسال...";
+
+
+      try{
+
+        const formData =
+          new FormData();
+
+
+        formData.append(
+          "paymentMethodId",
+          methodId
+        );
+
+
+        formData.append(
+          "amount",
+          amount
+        );
+
+
+        formData.append(
+          "proof",
+          proof
+        );
+
+
+        const data =
+          await api(
+            "/api/user/deposits",
+            {
+              method:"POST",
+              body:formData
+            }
+          );
+
+
+        alertBox.textContent =
+          data.message ||
+          "تم إرسال طلب الإيداع";
+
+        alertBox.className =
+          "alert show success";
+
+
+        document
+          .getElementById(
+            "depositForm"
+          )
+          .reset();
+
+
+        document
+          .getElementById(
+            "paymentInfo"
+          )
+          .classList.remove(
+            "show"
+          );
+
+
+        await loadWallet();
+
+        await loadDeposits();
+
+      }catch(error){
+
+        alertBox.textContent =
+          error.message ||
+          "فشل إرسال الطلب";
+
+        alertBox.className =
+          "alert show error";
+
+      }finally{
+
+        button.disabled =
+          false;
+
+        button.textContent =
+          "إرسال طلب الإيداع";
+
+      }
+
+    }
+  );
+
+
+/* =====================================================
+   WALLET TABS
+===================================================== */
+
+function openWalletTab(name){
+
+  document
+    .querySelectorAll(
+      ".wallet-tab"
+    )
+    .forEach(tab => {
+
+      tab.classList.toggle(
+        "active",
+        tab.dataset.walletTab ===
+          name
+      );
+
+    });
+
+
+  document
+    .querySelectorAll(
+      ".wallet-content"
+    )
+    .forEach(content => {
+
+      content.classList.toggle(
+        "active",
+        content.id ===
+          `wallet-${name}`
+      );
+
+    });
+
+
+  if(name === "deposits"){
+    loadDeposits();
+  }
+
+
+  if(name === "transactions"){
+    loadTransactions();
+  }
+
+}
+
+
+document
+  .querySelectorAll(
+    ".wallet-tab"
+  )
+  .forEach(tab => {
+
+    tab.addEventListener(
+      "click",
+      () => {
+
+        openWalletTab(
+          tab.dataset.walletTab
+        );
+
+      }
+    );
+
+  });
+
+
+/* =====================================================
+   DEPOSITS LIST
+===================================================== */
+
+async function loadDeposits(){
+
+  const container =
+    document.getElementById(
+      "depositsList"
+    );
+
+
+  container.innerHTML =
+    `<div class="loading">
+      جاري التحميل...
+    </div>`;
+
+
+  try{
+
+    const data =
+      await api(
+        "/api/user/deposits"
+      );
+
+
+    const deposits =
+      Array.isArray(
+        data.deposits
+      )
+        ? data.deposits
+        : [];
+
+
+    if(
+      deposits.length === 0
+    ){
+
+      container.innerHTML =
+        `<div class="empty">
+          لا توجد إيداعات حتى الآن
+        </div>`;
+
+      return;
+
+    }
+
+
+    container.innerHTML =
+      deposits
+      .map(
+        deposit => {
+
+          const status =
+            deposit.status;
+
+
+          const statusText =
+            status === "approved"
+              ? "مقبول"
+              : status === "rejected"
+                ? "مرفوض"
+                : "قيد المراجعة";
+
+
+          const statusClass =
+            status === "approved"
+              ? "green"
+              : status === "rejected"
+                ? "red"
+                : "yellow";
+
+
+          return `
+
+            <div class="list-item">
+
+              <div class="list-top">
+
+                <div class="list-title">
+
+                  ${escapeHtml(
+                    deposit.methodName ||
+                    "-"
+                  )}
+
+                </div>
+
+                <div class="${statusClass}">
+                  ${statusText}
+                </div>
+
+              </div>
+
+
+              <div class="list-info">
+
+                <span class="muted">
+                  المبلغ
+                </span>
+
+                <span class="green">
+                  ${money(
+                    deposit.amount
+                  )}
+                </span>
+
+              </div>
+
+
+              <div class="list-info">
+
+                <span class="muted">
+                  الشبكة
+                </span>
+
+                <span>
+                  ${escapeHtml(
+                    deposit.network ||
+                    "-"
+                  )}
+                </span>
+
+              </div>
+
+
+              <div class="list-info">
+
+                <span class="muted">
+                  التاريخ
+                </span>
+
+                <span>
+                  ${formatDate(
+                    deposit.createdAt
+                  )}
+                </span>
+
+              </div>
+
+
+              ${
+                deposit.adminNote
+                  ? `
+
+                    <div
+                      class="list-info"
+                      style="display:block;"
+                    >
+
+                      <span class="muted">
+                        ملاحظة الإدارة
+                      </span>
+
+                      <div
+                        style="margin-top:5px;"
+                      >
+                        ${escapeHtml(
+                          deposit.adminNote
+                        )}
+                      </div>
+
+                    </div>
+
+                  `
+                  : ""
+              }
+
+            </div>
+
+          `;
+
+        }
+      )
+      .join("");
+
+  }catch(error){
+
+    container.innerHTML =
+      `<div class="empty">
+        فشل تحميل الإيداعات
+      </div>`;
+
+  }
+
+}
+
+
+/* =====================================================
+   TRANSACTIONS
+===================================================== */
+
+async function loadTransactions(){
+
+  const container =
+    document.getElementById(
+      "transactionsList"
+    );
+
+
+  container.innerHTML =
+    `<div class="loading">
+      جاري تحميل المعاملات...
+    </div>`;
+
+
+  try{
+
+    const data =
+      await api(
+        "/api/user/transactions"
+      );
+
+
+    const transactions =
+      Array.isArray(
+        data.transactions
+      )
+        ? data.transactions
+        : [];
+
+
+    if(
+      transactions.length === 0
+    ){
+
+      container.innerHTML =
+        `<div class="empty">
+          لا توجد معاملات حتى الآن
+        </div>`;
+
+      return;
+
+    }
+
+
+    const names = {
+
+      deposit:
+        "إيداع",
+
+      withdrawal:
+        "سحب",
+
+      purchase:
+        "شراء",
+
+      reward:
+        "مكافأة",
+
+      refund:
+        "استرداد",
+
+      admin_adjustment:
+        "تعديل إداري"
+
+    };
+
+
+    container.innerHTML =
+      transactions
+      .map(
+        transaction => {
+
+          const amount =
+            Number(
+              transaction.amount || 0
+            );
+
+
+          const positive =
+            amount >= 0;
+
+
+          return `
+
+            <div class="list-item">
+
+              <div class="list-top">
+
+                <div class="list-title">
+
+                  ${escapeHtml(
+                    names[
+                      transaction.type
+                    ] ||
+                    transaction.type ||
+                    "-"
+                  )}
+
+                </div>
+
+                <div
+                  class="${
+                    positive
+                      ? "green"
+                      : "red"
+                  }"
+                >
+
+                  ${
+                    positive
+                      ? "+"
+                      : ""
+                  }${money(amount)}
+
+                </div>
+
+              </div>
+
+
+              <div class="list-info">
+
+                <span class="muted">
+                  الحالة
+                </span>
+
+                <span>
+                  ${
+                    transaction.status ===
+                    "completed"
+                      ? "مكتملة"
+                      : transaction.status ===
+                        "pending"
+                        ? "قيد المراجعة"
+                        : "مرفوضة"
+                  }
+                </span>
+
+              </div>
+
+
+              <div
+                class="list-info"
+                style="display:block;"
+              >
+
+                <span class="muted">
+                  الوصف
+                </span>
+
+                <div style="margin-top:5px;">
+                  ${escapeHtml(
+                    transaction.description ||
+                    "-"
+                  )}
+                </div>
+
+              </div>
+
+
+              <div class="list-info">
+
+                <span class="muted">
+                  التاريخ
+                </span>
+
+                <span>
+                  ${formatDate(
+                    transaction.createdAt
+                  )}
+                </span>
+
+              </div>
+
+            </div>
+
+          `;
+
+        }
+      )
+      .join("");
+
+  }catch(error){
+
+    container.innerHTML =
+      `<div class="empty">
+        فشل تحميل المعاملات
+      </div>`;
+
+  }
+
+}
+
+
+/* =====================================================
+   WITHDRAWAL
+===================================================== */
+
+function showWithdrawalInfo(){
+
+  showToast(
+    "قسم السحب سيتم تفعيله بعد إضافة نظام طلبات السحب.",
+    "error"
+  );
+
+}
+
+
+/* =====================================================
+   LOGOUT
+===================================================== */
+
+document
+  .getElementById(
+    "logoutBtn"
+  )
+  .addEventListener(
+    "click",
+    () => {
+
+      localStorage.removeItem(
+        "authToken"
+      );
+
+      localStorage.removeItem(
+        "user"
+      );
+
+      window.location.href =
+        "/login.html";
+
+    }
+  );
+
+
+/* =====================================================
+   INIT
+===================================================== */
+
+async function init(){
+
+  await loadSiteSettings();
+
+  await Promise.all([
+    loadProfile(),
+    loadProducts(),
+    loadMyProducts(),
+    loadWallet()
+  ]);
+
+}
+
+
+if(token){
+
+  init();
+
+}
+
+</script>
+
+</body>
+</html>
